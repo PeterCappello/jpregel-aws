@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.io.InvalidClassException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.activation.UnsupportedDataTypeException;
 
 /**

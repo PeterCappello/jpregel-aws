@@ -160,7 +160,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
             barrierSuperStepDone = new Barrier( integerToWorkerMap.size() );
             barrierComputation( startSuperStep, barrierSuperStepDone ); // broadcaast to workers: start a super step
             // BEGIN Post-step progress monitoring
-            if (superStep % 10 == 0) 
+            if (superStep % 1 == 0) 
             {
                 long endStepTime = System.currentTimeMillis();
                 long elapsedTime = endStepTime - startStepTime;

@@ -44,4 +44,15 @@ public final class VertexShortestPathBinaryTree extends VertexShortestPath
         return new VertexShortestPathBinaryTree( vertexId, vertexValue, edgeMap );
     }
     
+    @Override
+    public int getPartId(Integer id, int numparts) {
+        numparts--;
+        if(id < (numparts)) {
+            return 0;
+        }
+        while(((id >> 1) >= (numparts))) {
+            id >>=1;
+        }
+        return id-numparts+1;
+    }
 }
