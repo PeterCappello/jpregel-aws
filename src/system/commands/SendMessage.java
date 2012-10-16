@@ -60,4 +60,9 @@ public class SendMessage implements Command
         this.message = (Message) oi.readObject();
         this.superStep = oi.readLong();
     }
+    
+    @Override
+    public String toString() {
+        return sendingWorkerNum+" "+partId+" "+vertexId+" message: ({"+message+"} "+superStep;
+    }
 }
