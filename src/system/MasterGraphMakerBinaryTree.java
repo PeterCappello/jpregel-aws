@@ -21,10 +21,6 @@ import java.util.logging.Logger;
  * The worker reading the file creates vertices and out edges for vertices v, v
  * + 1, v + 2, ..., v + blockSize - 1, with their edges.
  *
- *
- *
-
- *
  * @author Pete Cappello
  */
 public class MasterGraphMakerBinaryTree implements MasterGraphMaker
@@ -59,8 +55,7 @@ public class MasterGraphMakerBinaryTree implements MasterGraphMaker
         for (int vertexNum = 1, fileNum = 1; fileNum <= numWorkers; fileNum++)
         {
             // open file for output in "in" directory
-            BufferedWriter bufferedWriter = null;
-            bufferedWriter = fileSystem.getWorkerInputFileOutputStream(fileNum);
+            BufferedWriter bufferedWriter = fileSystem.getWorkerInputFileOutputStream(fileNum);
             int verticesPerFile = numV / numWorkers;
             if (fileNum <= numV % numWorkers)
             {

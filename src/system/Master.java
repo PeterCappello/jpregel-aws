@@ -45,6 +45,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     private Map<Integer, Service> integerToWorkerMap = new HashMap<Integer, Service>();
     protected AtomicInteger numRegisteredWorkers = new AtomicInteger();
     private volatile int numProcessorsPerWorker;
+    
     // computation control
     protected int numUnfinishedWorkers;
     protected boolean commandExeutionIsComplete;
@@ -78,10 +79,8 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
         super.setService(this);
         super.setDepartments(departments);
         numUnfinishedWorkers += numWorkers;
-        out.println("Master.makeWorkers: waiting for Worker registration to complete");
-        if (numUnfinishedWorkers > 0 && !commandExeutionIsComplete) 
+        if (numUnfinishedWorkers > 0 && ! commandExeutionIsComplete) 
         {
-            System.out.println("Master.makeWorkers: about to wait: numUnfinishedWorkers: " + numUnfinishedWorkers);
             wait(); // until numUnfinishedWorkers == 0
         }
         setWorkerMap();
@@ -235,6 +234,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
         int workerNum = numRegisteredWorkers.incrementAndGet();
         integerToWorkerMap.put(workerNum, workerService);
         processAcknowledgement();
+        System.out.println("Master.registerWorker: workerNum: " + workerNum);
         return workerNum;
     }
 

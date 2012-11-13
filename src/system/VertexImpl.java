@@ -53,6 +53,7 @@ implements Vertex<VertexIdType, VertexValueType, EdgeValueType, MessageValueType
 {
     public    static Combiner combiner; // null means no combining
     protected static int      numVertices;
+    protected static int      availableProcessors = Runtime.getRuntime().availableProcessors();
     
     private final VertexIdType    vertexId;
     private       VertexValueType vertexValue;
@@ -157,6 +158,10 @@ implements Vertex<VertexIdType, VertexValueType, EdgeValueType, MessageValueType
         
     @Override
     public VertexValueType getVertexValue() { return vertexValue; }
+    
+    public int getWorkerNum( int partId, int numWorkers ) { System.out.println("VertexImpl.getWorkerNum: partId: "
+            + partId);
+        return ( partId % numWorkers ) + 1; }
     
     @Override
     public abstract VertexImpl make( String line );

@@ -18,6 +18,7 @@ import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -55,23 +56,11 @@ public abstract class Worker extends ServiceImpl
     };
     
     private final static RemoteExceptionHandler REMOTE_EXCEPTION_HANDLER = new DefaultRemoteExceptionHandler();
-
-    private static void tryAgain(int i)
-    {
-        System.out.println("Master not up yet. Trying again in 5 seconds...");
-        try
-        {
-            Thread.sleep(5000);
-        } catch (InterruptedException ex1)
-        {
-            System.out.println("Waiting interrupted, trying again immediately");
-        }
-    }
-    
     private final Proxy masterProxy;
-    private int myWorkerNum = 0;
+    private final int numAvailableProcessors = Runtime.getRuntime().availableProcessors();
     private final ComputeThread[] computeThreads;
     
+    private int myWorkerNum;
     private Map<Integer, Service> workerNumToWorkerMap;
     private Job job;
     private ConcurrentMap<Integer, Part> partIdToPartMap; 
@@ -96,6 +85,9 @@ public abstract class Worker extends ServiceImpl
     private final Command MessageReceived = new MessageReceived();
     private final Service master;
     
+    // configuration variables
+    static final boolean BATCH_MESSAGES = true;
+    
     public Worker( Service master ) throws RemoteException
     {
         // set Jicos Service attributes
@@ -105,8 +97,6 @@ public abstract class Worker extends ServiceImpl
         this.master = master;
         masterProxy = new ProxyMaster( master, this, REMOTE_EXCEPTION_HANDLER );
         addProxy(master, masterProxy);
-                
-        int numAvailableProcessors = Runtime.getRuntime().availableProcessors();
         System.out.println("Worker.constructor: Available processors: " + numAvailableProcessors ) ; 
         computeThreads = new ComputeThread[ numAvailableProcessors ];
         for ( int i = 0; i < computeThreads.length; i++ )
@@ -118,9 +108,9 @@ public abstract class Worker extends ServiceImpl
     public void init() throws RemoteException 
     {
         super.setService( this );
-        CommandSynchronous command = new RegisterWorker( serviceName(), Runtime.getRuntime().availableProcessors() ); 
-        myWorkerNum =((Integer) master.executeCommand( this, command )); 
-        super.register ( master );
+        super.register( master );
+        CommandSynchronous command = new RegisterWorker( serviceName(), numAvailableProcessors ); 
+        myWorkerNum = (Integer) master.executeCommand( this, command );
         startComputeThreads();
     }
     
@@ -129,6 +119,18 @@ public abstract class Worker extends ServiceImpl
         for ( ComputeThread computeThread : computeThreads )
         {
             computeThread.start();
+        }
+    }
+    
+    private static void tryAgain(int i)
+    {
+        System.out.println("Master not up yet. Trying again in 5 seconds...");
+        try
+        {
+            Thread.sleep(5000);
+        } catch (InterruptedException ex1)
+        {
+            System.out.println("Waiting interrupted, trying again immediately");
         }
     }
  
@@ -153,11 +155,7 @@ public abstract class Worker extends ServiceImpl
     
     synchronized public Job getJob() { return job; }
     
-    public int getWorkerNum( int partId )
-    {
-        int numWorkers = workerNumToWorkerMap.size();
-        return ( partId % numWorkers ) + 1;
-    }
+    public int getWorkerNum( int partId ) { return job.getWorkerNum( partId, workerNumToWorkerMap.size() ); }
       
     // TODO omit this method by converting all worker graph makers
     synchronized public void addVertex( VertexImpl vertex, String stringVertex )
@@ -290,14 +288,24 @@ public abstract class Worker extends ServiceImpl
         sendCommand( master, command );
         
         // output part sizes to see how PartId for vertices are distributed
-        for ( Part part : partSet )
+        Collection<Integer> partIdSet = partIdToPartMap.keySet();
+        for ( Integer partId : partIdSet )
         {
-            out.println("Worker.processInputFile: worker: " + myWorkerNum  + " PartId: " + part.getPartId() + " size: " + part.getVertexIdToVertexMap().size() );
+            Part part = partIdToPartMap.get(partId);
+            Map<Object, VertexImpl> vertexIdToVertexMap = part.getVertexIdToVertexMap();
+            System.out.println("Worker.processInputFile: workerNum: " + myWorkerNum + "  partId: " + partId 
+                    + "  Size: " + vertexIdToVertexMap.size() );
+//            Collection<Object> vertexIdSet = vertexIdToVertexMap.keySet();
+//            for ( Object vertexId : vertexIdSet )
+//            {
+//                System.out.println("    workerNum: " + myWorkerNum + "  partId: " + partId
+//                        + "  vertexId: " + ((Integer) vertexId ) );
+//            }
         }
     }
     
     // Command: SendMessage
-    public void receiveMessage( int sendingWorkerNum, int partId, int vertexId, Message message, long superStep )
+    public void receiveMessage( int sendingWorkerNum, int partId, Object vertexId, Message message, long superStep )
     {
         Part receivingPart = partIdToPartMap.get( partId );
         receivingPart.receiveMessage( vertexId, message, superStep );
@@ -306,7 +314,7 @@ public abstract class Worker extends ServiceImpl
     
     // Command: SendVertexIdToMessageQMap
     synchronized public void receiveVertexIdToMessageQMap( Service sendingWorker, Map<Object, MessageQ> vertexIdToMessageQMap, Long superStep )
-    {
+    {       
         for ( Object vertexId : vertexIdToMessageQMap.keySet() )
         {
             int partId = job.getPartId( vertexId );
@@ -364,8 +372,23 @@ public abstract class Worker extends ServiceImpl
     }
     
     // Command: StartSuperStep
-    public void startSuperStep( ComputeInput computeInput )
+    public void startSuperStep( ComputeInput computeInput ) throws InterruptedException
     {
+        // BEGIN DEBUG
+//        for ( Integer partId : partIdToPartMap.keySet() )
+//        {
+//            if ( partIdToPartMap.get( partId ) == null )
+//            {
+//                System.out.println("Worker.startSuperStep: workerNum: " + myWorkerNum 
+//                        + "  missing partId: " + partId );
+//            }
+//            else
+//            {
+//                System.out.println("Worker.startSuperStep: workerNum: " + myWorkerNum
+//                +  "  PRESENT partId: " + partId );
+//            }
+//        }
+        // END DEBUG
         barrierComputation( computeInput );
         ComputeOutput computeOutput = new ComputeOutput( thereIsANextStep, stepAggregator, problemAggregator, deltaNumVertices );
         Command command = new SuperStepComplete( computeOutput );
@@ -399,7 +422,7 @@ public abstract class Worker extends ServiceImpl
         }
     }
     
-    synchronized private void barrierComputation( ComputeInput computeInput )
+    synchronized private void barrierComputation( ComputeInput computeInput ) throws InterruptedException
     { 
         thereIsANextStep = false;
         superStep++;
@@ -415,11 +438,7 @@ public abstract class Worker extends ServiceImpl
         }
         while ( numWorkingComputeThreads.get() > 0 )
         {
-            try
-            {
-                wait(); // until all ComputeThreads complete
-            }
-            catch ( InterruptedException ignore ) {}
+            wait(); // until all ComputeThreads complete
         }
         // send each other worker its messages generated by this worker
         int numWorkersSentMessages = workerNumToVertexIdToMessageQMapMap.size();
@@ -468,7 +487,7 @@ public abstract class Worker extends ServiceImpl
         return master;
     }
         
-    void sendMessage( int partId, int vertexId, Message message, long superStep )
+    void sendMessage( int partId, Object vertexId, Message message, long superStep )
     {
         Part receivingPart = partIdToPartMap.get( partId );
         if ( receivingPart != null )

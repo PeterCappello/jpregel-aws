@@ -5,24 +5,18 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import jicosfoundation.Command;
 import jicosfoundation.Proxy;
-import jicosfoundation.ServiceImpl;
 import system.Worker;
 /**
  *
  * @author Pete Cappello
  */
-public class AddVertexToPartComplete implements Command
+public class AddVertexToPartComplete implements Command<Worker>
 {
-
     @Override
     public void execute( Proxy proxy ) { proxy.sendCommand( this ); }
 
     @Override
-    public void execute(ServiceImpl serviceImpl) throws Exception 
-    {
-        Worker worker = (Worker) serviceImpl;
-        worker.addVertexToPartComplete();
-    }
+    public void execute( Worker worker) { worker.addVertexToPartComplete(); }
 
     @Override
     public void writeExternal(ObjectOutput oo) throws IOException{}

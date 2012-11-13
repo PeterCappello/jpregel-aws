@@ -138,9 +138,11 @@ public final class Job implements Serializable
         
     FileSystem getFileSystem() { return fileSystem; }
     
-    int        getNumParts()   { return numParts; }
+    int getNumParts()   { return numParts; }
             
-    int        getPartId( Object vertexId ) { return vertexFactory.getPartId( vertexId, numParts ); }
+    int getPartId( Object vertexId ) { return vertexFactory.getPartId( vertexId, numParts ); }
+    
+    int getWorkerNum( int partId, int numWorkers ) { return vertexFactory.getWorkerNum( partId, numWorkers ); }
     
     VertexImpl getVertexFactory() { return vertexFactory; }
         

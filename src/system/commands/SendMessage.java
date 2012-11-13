@@ -17,12 +17,12 @@ public class SendMessage implements Command
 {
     private int sendingWorkerNum;
     private int partId;
-    private int vertexId; 
+    private Object vertexId; 
     private Message message;
     private long superStep;
     
     public SendMessage(){}
-    public SendMessage( int sendingWorkerNum, int partId, int vertexId, Message message, Long superStep )
+    public SendMessage( int sendingWorkerNum, int partId, Object vertexId, Message message, Long superStep )
     {
         this.sendingWorkerNum = sendingWorkerNum;
         this.partId = partId;
@@ -46,7 +46,8 @@ public class SendMessage implements Command
     {
         oo.writeInt(sendingWorkerNum);
         oo.writeInt(partId);
-        oo.writeInt(vertexId);
+//        oo.writeInt(vertexId);
+        oo.writeObject(vertexId);
         oo.writeObject(message);
         oo.writeLong(superStep);
     }

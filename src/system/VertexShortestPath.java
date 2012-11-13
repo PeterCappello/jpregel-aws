@@ -11,21 +11,22 @@ import java.util.StringTokenizer;
  * The value associated with each vertex, v, is: 
  * 1. the minimum distance to vertex v
  * 2. the vertexId of vertex u, where edge (u, v) is on a shortest path to v.
- * Since these 2 items constitute a Message, vertexValue is a Message.
+ * Since these 2 items constitute a Message, vertexValue's type is Message.
  * 
  * @author Pete Cappello
  */
 public class VertexShortestPath extends VertexImpl<Integer, Message<Integer, Integer>, Integer, Integer>
 {
-    public VertexShortestPath( Integer vertexId, Map<Integer, Integer> edgeMap,int numOutgoingEdges )
+    public VertexShortestPath( Integer vertexId, Map<Integer, Integer> edgeMap, int numOutgoingEdges )
     {
-        super( vertexId, edgeMap,numOutgoingEdges );
+        super( vertexId, edgeMap, numOutgoingEdges );
         setVertexValue( new Message<Integer, Integer>( vertexId, Integer.MAX_VALUE ) );
         combiner = new CombinerMinInteger();
     }
     
-    public VertexShortestPath( Integer vertexId, Map<Integer, Integer> edgeMap ) {
-        super( vertexId, edgeMap);
+    public VertexShortestPath( Integer vertexId, Map<Integer, Integer> edgeMap ) 
+    {
+        super( vertexId, edgeMap );
         setVertexValue( new Message<Integer, Integer>( vertexId, Integer.MAX_VALUE ) );
         combiner = new CombinerMinInteger();
     }
@@ -93,17 +94,18 @@ public class VertexShortestPath extends VertexImpl<Integer, Message<Integer, Int
     @Override
     public String output() 
     {
-        StringBuilder string = new StringBuilder();
-        string.append( "" );
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append( "" );
         if ( getNumVertices() == getVertexId() )
         {
-            string.append( getVertexId() );
-            string.append( " : ");
-            string.append( getVertexValue().getVertexId() );
-            string.append( " - ");
-            string.append( getVertexValue().getMessageValue() );
+            System.out.println("   VertexShortestPath.output: VertexId: " + getVertexId());
+            stringBuilder.append( getVertexId() );
+            stringBuilder.append( " : ");
+            stringBuilder.append( getVertexValue().getVertexId() );
+            stringBuilder.append( " - ");
+            stringBuilder.append( getVertexValue().getMessageValue() );
         }
-        return new String( string );
+        return stringBuilder.toString();
     }
     
     @Override

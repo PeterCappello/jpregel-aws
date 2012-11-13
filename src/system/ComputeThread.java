@@ -23,7 +23,7 @@ public class ComputeThread extends Thread
         
     void initJob()
     {
-        super.setName("Worker "+worker.getWorkerNum()+ "'s ComputeThread");
+        super.setName("Worker " + worker.getWorkerNum()+ "'s ComputeThread");
         workIsAvailable = false;
         partIdToPartMap = null;
         workerNumToVertexIdToMessageQMapMap = null;
@@ -72,36 +72,41 @@ public class ComputeThread extends Thread
     
     void removeVertex() { deltaNumVertices--; }
     
-    void sendMessage( int receivingPartId, Object vertexId, Message message, Long superStep )
+    void sendMessage( int receivingPartId, Object receivingVertexId, Message message, Long superStep )
     {
         Part receivingPart = partIdToPartMap.get( receivingPartId );
         if ( receivingPart != null )
         {
             // receivingPart is local to this Worker
-            receivingPart.receiveMessage( vertexId, message, superStep );
+            receivingPart.receiveMessage( receivingVertexId, message, superStep );
         }
         else
-        {
-            // TODO ComputeThread: Later: monitor size of map: when too large, give to Worker to combine/send & reinitialize
-            
-            // get vertexIdToMessageQMap for destination Worker
-            int workerNum = worker.getWorkerNum( receivingPartId );
-            Map<Object, MessageQ> vertexIdToMessageQMap = workerNumToVertexIdToMessageQMapMap.get( workerNum );
-            if ( vertexIdToMessageQMap == null )
+        {  
+            int receivingWorkerNum = worker.getWorkerNum( receivingPartId );
+            if ( Worker.BATCH_MESSAGES )
             {
-                vertexIdToMessageQMap = new HashMap<Object, MessageQ>();
-                workerNumToVertexIdToMessageQMapMap.put( workerNum, vertexIdToMessageQMap );
+//              TODO ComputeThread: Monitor map.size(): when too large, Worker combines, sends, & reinitializes
+                // get vertexIdToMessageQMap for destination Worker
+                Map<Object, MessageQ> vertexIdToMessageQMap = workerNumToVertexIdToMessageQMapMap.get( receivingWorkerNum );
+                if ( vertexIdToMessageQMap == null )
+                {
+                    vertexIdToMessageQMap = new HashMap<Object, MessageQ>();
+                    workerNumToVertexIdToMessageQMapMap.put( receivingWorkerNum, vertexIdToMessageQMap );
+                }
+
+                // get receivingVertex's MessageQ
+                MessageQ receivingVertexMessageQ = vertexIdToMessageQMap.get( receivingVertexId );
+                if ( receivingVertexMessageQ == null )
+                {
+                    receivingVertexMessageQ = new MessageQ( combiner );
+                    vertexIdToMessageQMap.put( receivingVertexId, receivingVertexMessageQ );
+                }
+                receivingVertexMessageQ.add( message ); 
             }
-            
-            // get MessageQ for vertex
-            MessageQ messageQ = vertexIdToMessageQMap.get( vertexId );
-            if ( messageQ == null )
+            else
             {
-                messageQ = new MessageQ( combiner );
-                vertexIdToMessageQMap.put( vertexId, messageQ );
+                worker.sendMessage( receivingPartId, receivingVertexId, message, superStep );
             }
-            messageQ.add( message );           
-//            worker.sendMessage( receivingPartId, vertexId, message, superStep );
         }
     }
     

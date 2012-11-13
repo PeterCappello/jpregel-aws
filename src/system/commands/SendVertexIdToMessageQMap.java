@@ -15,7 +15,7 @@ import system.Worker;
  *
  * @author Pete Cappello
  */
-public class SendVertexIdToMessageQMap implements Command
+public class SendVertexIdToMessageQMap implements Command<Worker>
 {
     private Service sendingWorker;
     private Map<Object, MessageQ> vertexIdToMessageQMap;
@@ -33,9 +33,8 @@ public class SendVertexIdToMessageQMap implements Command
     public void execute( Proxy proxy ) { proxy.sendCommand( this ); }
 
     @Override
-    public void execute(ServiceImpl serviceImpl) throws Exception 
+    public void execute(Worker worker) throws Exception 
     {
-        Worker worker = (Worker) serviceImpl;
         worker.receiveVertexIdToMessageQMap( sendingWorker, vertexIdToMessageQMap, superStep );
     }
 
