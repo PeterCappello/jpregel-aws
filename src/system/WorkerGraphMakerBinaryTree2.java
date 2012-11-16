@@ -60,7 +60,6 @@ public class WorkerGraphMakerBinaryTree2 implements WorkerGraphMaker
                     " numParts: " + numParts + " lgNumParts: " + lgNumParts + " partTreeHeight: " + partTreeHeight
                     + " numPartTreeFullDepthLeaves: " + numPartTreeFullDepthLeaves);
             
-            
             // determine my partitions
             int myStartPartId = (worker.getWorkerNum() - 1) * numPartsPerWorker;
             int myStopPartId = myStartPartId + numPartsPerWorker - 1;
@@ -79,7 +78,6 @@ public class WorkerGraphMakerBinaryTree2 implements WorkerGraphMaker
                 numVerticesMade += partSize;
                 Callable<Object> task = new PopulatePart( worker, partId, partSize );
                 executorService.submit( task );
-//                task.call();
             }            
             executorService.shutdown();
             executorService.awaitTermination( Long.MAX_VALUE, TimeUnit.DAYS );
@@ -151,7 +149,7 @@ public class WorkerGraphMakerBinaryTree2 implements WorkerGraphMaker
         @Override
         public Object call()
         {
-//            System.out.println("PopulatePart: workerNum: " + worker.getWorkerNum() + "  partId: " + partId + "  partSize: " + partSize );
+            System.out.println("PopulatePart: workerNum: " + worker.getWorkerNum() + "  partId: " + partId + "  partSize: " + partSize );
             
             int numVerticesMade = 0;
             
@@ -173,50 +171,36 @@ public class WorkerGraphMakerBinaryTree2 implements WorkerGraphMaker
             numVerticesMade++;
             
             // make partTree vertices
-            // TODO: Can we do this while creating less garbage?
             LinkedList<Integer> q = new LinkedList<Integer>();
-            q.add( numParts + partId );
-            while ( numVerticesMade < partSize )
+            int partTreeRootVertexId = numParts + partId; // vertex has been made
+            q.add( 2 * partTreeRootVertexId );
+            q.add( 2 * partTreeRootVertexId + 1 );
+            for ( ; numVerticesMade < partSize; numVerticesMade++ )
             {
-                int leftChildVertexId = 2 * q.removeFirst();
-                if ( leftChildVertexId > numVertices )
+                vertexId = q.removeLast();
+                int numChildren = 0;
+                if ( 2 * vertexId <= numVertices )
                 {
-                    break;
-                }
-//                System.out.println("   partTree: " + partId + "  leftChildVertexId: " + leftChildVertexId);
-                int numGrandChildren = 0;
-                if ( 2 * leftChildVertexId <= numVertices )
-                {
-                    numGrandChildren++;
-                    if ( 2 * leftChildVertexId + 1 <= numVertices )
+                    numChildren++;
+                    q.add( 2 * vertexId );
+                    if ( 2 * vertexId + 1 <= numVertices )
                     {
-                        numGrandChildren++;
+                        numChildren++;
+                        q.add( 2 * vertexId + 1 );
                     }
                 }
-                vertex = vertexFactory.make( leftChildVertexId, numGrandChildren );
+                vertex = vertexFactory.make( vertexId, numChildren );
                 worker.addVertexToPart(partId, vertex);
-                q.addLast( leftChildVertexId );
-                
-                // is there a right child?
-                int rightChildVertexId = leftChildVertexId + 1;
-                if ( ++numVerticesMade < partSize && rightChildVertexId <= numVertices )
-                {
-//                    System.out.println("   partTree: " + partId + "  rightChildVertexId: " + rightChildVertexId);
-                    numGrandChildren = 0;
-                    if ( 2 * rightChildVertexId <= numVertices )
-                    {
-                        numGrandChildren++;
-                        if ( 2 * rightChildVertexId + 1 <= numVertices )
-                        {
-                            numGrandChildren++;
-                        }
-                    }
-                    vertex = vertexFactory.make( rightChildVertexId, numGrandChildren );
-                    worker.addVertexToPart(partId, vertex);
-                    q.addLast( rightChildVertexId );
-                    numVerticesMade++;
-                }
+//                System.out.println(" PartId: " + partId + "  vertexId: " + vertexId);
             }
+            
+            // BEGIN DEBUG
+            while ( q.size() > 0 )
+            {
+                System.out.println(" IN FLUSH LOOP: vertexId: " + q.removeLast() + "  partSize: " + partSize);
+            }
+            // END DEBUG
+            assert q.isEmpty();
             return null;
         }
     }
