@@ -374,6 +374,12 @@ public abstract class Worker extends ServiceImpl
     // Command: StartSuperStep
     public void startSuperStep( ComputeInput computeInput ) throws InterruptedException
     {
+        long freeMemory = Runtime.getRuntime().freeMemory();
+        long maxMemory = Runtime.getRuntime().maxMemory();
+        int percentFreeMemory = (int) (((float) freeMemory / maxMemory) * 100);
+        System.out.println("SuperStep: " + superStep
+                        + " Maximum memory that is free: " + percentFreeMemory + "%"
+                        + " : " + (freeMemory / 1000) + "KB");
         // BEGIN DEBUG
 //        for ( Integer partId : partIdToPartMap.keySet() )
 //        {
