@@ -1,8 +1,6 @@
 package clients;
 
-import JpAws.Ec2ReservationService;
 import JpAws.PregelAuthenticator;
-import api.Cluster;
 import com.amazonaws.services.s3.AmazonS3Client;
 import java.io.File;
 import java.rmi.Naming;
@@ -16,7 +14,8 @@ import system.WorkerOutputMakerStandard;
 import vertices.VertexSsspBinaryTree;
 
 /**
- *
+ * A client that uses a preexisting AWS Cluster.
+ * 
  * @author Pete Cappello
  */
 public class ClientSsspBinaryTree
