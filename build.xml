@@ -152,7 +152,7 @@
     
     <target depends="init,javadoc-build-api,javadoc-browse-api" description="Build Javadoc." name="javadoc-api"/>
     <target name="launch-cluster-ec2" description="Launch ec2 cluster" depends="init" >
-        <java classpath="dist/jpregel-aws.jar" classname="clients.ClusterLaunhEc2" fork="true" >
+        <java classpath="dist/jpregel-aws.jar" classname="clients.ClusterLaunchEc2" fork="true" >
             <jvmarg value="-Djava.security.policy=policy"/>
             <arg value="1"/> <!-- number of workers -->
         </java>
