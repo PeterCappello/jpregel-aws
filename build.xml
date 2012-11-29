@@ -151,19 +151,15 @@
     </target>
     
     <target depends="init,javadoc-build-api,javadoc-browse-api" description="Build Javadoc." name="javadoc-api"/>
-    </target>
-    
-    <target name="launch-cluster-ec2" description="Launch ec2 cluster" depends="init,build" />
-        <java classpath="dist/jpregel-aws.jar" classname="clients.ClusterLaunhEc2" fork="true" />
+    <target name="launch-cluster-ec2" description="Launch ec2 cluster" depends="init" >
+        <java classpath="dist/jpregel-aws.jar" classname="clients.ClusterLaunhEc2" fork="true" >
             <jvmarg value="-Djava.security.policy=policy"/>
             <arg value="1"/> <!-- number of workers -->
         </java>
-    </target>
-    
-    <target name="terminate-cluster-ec2" description="Terminate ec2 cluster" depends="init,build" />
-        <java classpath="dist/jpregel-aws.jar" classname="clients.ClusterTerminate" fork="true" />
+    </target>   
+    <target name="terminate-cluster-ec2" description="Terminate ec2 cluster" depends="init" >
+        <java classpath="dist/jpregel-aws.jar" classname="clients.ClusterTerminate" fork="true" >
             <jvmarg value="-Djava.security.policy=policy"/>
         </java>
     </target>
-  
 </project>
