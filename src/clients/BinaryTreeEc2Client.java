@@ -4,13 +4,13 @@
  */
 package clients;
 
-import vertices.VertexShortestPathBinaryTree;
 import JpAws.Ec2ReservationService;
 import JpAws.PregelAuthenticator;
 import api.Cluster;
 import com.amazonaws.services.s3.AmazonS3Client;
 import java.io.File;
 import system.*;
+import vertices.VertexShortestPathBinaryTree;
 
 /**
  *
@@ -24,7 +24,7 @@ public class BinaryTreeEc2Client
 //        File clusterFile = new File("cluster.AWS");
         Cluster master;
 //        if(clusterFile.exists()) {
-//            master = (Cluster) new ObjectInputStream(new FileInputStream(clusterFile)).readObject();
+//            master = (ClusterImpl) new ObjectInputStream(new FileInputStream(clusterFile)).readObject();
 //            master.reset();
 //        } else {
             master = Ec2ReservationService.newMassiveCluster(numWorkers);

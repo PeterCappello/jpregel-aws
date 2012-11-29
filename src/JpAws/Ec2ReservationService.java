@@ -1,6 +1,7 @@
 package JpAws;
 
 import api.Cluster;
+import api.ClusterImpl;
 import api.MachineGroup;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.ec2.AmazonEC2;
@@ -29,7 +30,7 @@ public class Ec2ReservationService extends ReservationServiceImpl
      */
     public static final String AMIID = "ami-e565ba8c";
     /**
-     * This is the AMI-ID for Cluster Compute instances - they need an HVM image.
+     * This is the AMI-ID for ClusterImpl Compute instances - they need an HVM image.
      */
     public static final String HVM_AMIID = "ami-0da96764";
     /**
@@ -45,7 +46,7 @@ public class Ec2ReservationService extends ReservationServiceImpl
         heapSizeMap.put("m1.medium", "-Xmx3600m -Xms3600m ");
         heapSizeMap.put("cc2.8xlarge","-Xmx58000m -Xms58000m -XX:+UseConcMarkSweepGC"); //on machines with more than 2 cores, drastically improves performance. 
         heapSizeMap.put("m1.large","-Xmx7100m -Xms7100m");
-        DescribeSecurityGroupsResult describeSecurityGroups = null;
+        DescribeSecurityGroupsResult describeSecurityGroups;
         final DescribeSecurityGroupsRequest req = new DescribeSecurityGroupsRequest().withGroupNames(SECURITY_GROUP);
         try
         {
@@ -67,15 +68,20 @@ public class Ec2ReservationService extends ReservationServiceImpl
         }
     }
 
-    public static Cluster  newSmallCluster(int numWorkers) throws Exception
+    public static Cluster newSmallCluster(int numWorkers) throws Exception
     {
         Ec2ReservationService rs = new Ec2ReservationService();
-        return new Cluster(rs,"m1.small","m1.small",numWorkers);
+        Cluster cluster = new ClusterImpl(rs,"m1.small","m1.small",numWorkers);
+        cluster.register();
+        return cluster;
     }
 
-    public static Cluster newMassiveCluster(int numWorkers) throws Exception {
+    public static Cluster newMassiveCluster(int numWorkers) throws Exception 
+    {
         Ec2ReservationService rs = new Ec2ReservationService();
-        return new Cluster(rs,"cc2.8xlarge","cc2.8xlarge",numWorkers);
+        Cluster cluster = new ClusterImpl(rs,"cc2.8xlarge","cc2.8xlarge",numWorkers);
+        cluster.register();
+        return cluster;
     }
     
     @Override
@@ -104,4 +110,6 @@ public class Ec2ReservationService extends ReservationServiceImpl
         instanceGroup.launch(launchConfiguration, TimeUnit.MINUTES, 5);
         return new Ec2MasterMachineGroup(instanceGroup, heapSizeMap.get(instanceType));
     }
+    
+    
 }

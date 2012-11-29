@@ -151,7 +151,7 @@ public final class Job implements Serializable
      */
     String            getJobName()           { return jobName; }
     
-    String            getJobDirectoryName()  { return jobDirectoryName; }
+    public String            getJobDirectoryName()  { return jobDirectoryName; }
         
     Aggregator        getProblemAggregator() { return problemAggregator; }
     

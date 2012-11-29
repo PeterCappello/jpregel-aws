@@ -8,16 +8,13 @@ import system.ClientToMaster;
 import system.FileSystem;
 import system.Master;
 
-
 /**
  *
  * @author Charles Munger
  */
 public class Ec2Master extends Master
-{
-    
-    Ec2Master() throws RemoteException
-    {}
+{  
+    Ec2Master() throws RemoteException {}
     
     public static void main(String[] args) throws Exception
     {

@@ -106,15 +106,12 @@ public class WorkerGraphMakerBinaryTree2 implements WorkerGraphMaker
 //        System.out.print("    numPartFullDepthLeaves: partId: " + partId + "  leftFullDepthLeafId: " + leftFullDepthLeafId);
         if ( numVertices < leftFullDepthLeafId )
         {
-//            System.out.println(" " + 0 );
             return 0;
         }
         if ( numVertices >= leftFullDepthLeafId + numPartTreeFullDepthLeaves )
         {
-//            System.out.println(" " + numPartTreeFullDepthLeaves );
             return numPartTreeFullDepthLeaves;
         }
-//        System.out.println(" " + ( numVertices - leftFullDepthLeafId + 1 ) );
         return numVertices - leftFullDepthLeafId + 1;
     }
     
@@ -191,7 +188,6 @@ public class WorkerGraphMakerBinaryTree2 implements WorkerGraphMaker
                 }
                 vertex = vertexFactory.make( vertexId, numChildren );
                 worker.addVertexToPart(partId, vertex);
-//                System.out.println(" PartId: " + partId + "  vertexId: " + vertexId);
             }
             
             // BEGIN DEBUG

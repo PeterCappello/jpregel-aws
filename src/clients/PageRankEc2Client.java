@@ -19,8 +19,8 @@ public class PageRankEc2Client
                 new WorkerOutputMakerStandard()
                 );
         System.out.println( job + "\n       numWorkers:" + numWorkers );
-        Cluster master = Ec2ReservationService.newSmallCluster(numWorkers);
-        master.run( job);    
+        Cluster cluster = Ec2ReservationService.newSmallCluster(numWorkers);
+        cluster.run( job);    
         System.exit( 0 );
     }
 }

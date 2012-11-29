@@ -2,18 +2,17 @@ package api;
 
 import system.FileSystem;
 
-//     Put this code in the subclasses of FileSystem. Then, invoke the 
-//     "openInputBuffer" method (or whatever it will be called).
-
 /**
+ * The MasterGraphMaker makes a file for each WorkerGraphMaker that indicates
+ * what portion of the graph to make.
  * Each jpregel Job specifies a MasterGraphMaker.
  * <p>
  * A MasterGraphMaker
  * <ol>
- *     <li>optionally reads the <i>input</i> file;</li>
- *     <li>produces an input file for each Worker: 
- *         The file for Worker number <i>n</i> is named <i>n</i>
- *         and resides in the <i>in</i> directory.
+ *     <li>optionally reads the job <b>input</b> file;</li>
+ *     <li>makes an input file for each Worker: 
+ *         The file for Worker number <i>n</i> is named <b>n</b>
+ *         and resides in the <b>in</b> directory.
  *     </li>
  * </ol>
  * </p>

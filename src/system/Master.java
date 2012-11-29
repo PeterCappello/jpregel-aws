@@ -67,11 +67,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     protected Aggregator problemAggregator;
     protected int numVertices;
 
-    public Master() throws RemoteException 
-    {
-        // Establish Master as a Jicos Service
-        super(command2DepartmentArray);
-    }
+    public Master() throws RemoteException { super(command2DepartmentArray); } // set Master as a Jicos Service
 
     @Override
     public synchronized void init(int numWorkers) throws RemoteException, InterruptedException 

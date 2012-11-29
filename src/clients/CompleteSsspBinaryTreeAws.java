@@ -1,12 +1,12 @@
 package clients;
 
+import JpAws.Ec2ReservationService;
 import JpAws.PregelAuthenticator;
+import api.Cluster;
 import com.amazonaws.services.s3.AmazonS3Client;
 import java.io.File;
-import java.rmi.Naming;
 import system.Job;
 import system.JobRunData;
-import system.Master;
 import system.MasterGraphMakerBinaryTree2;
 import system.MasterOutputMakerStandard;
 import system.WorkerGraphMakerBinaryTree2;
@@ -14,35 +14,36 @@ import system.WorkerOutputMakerStandard;
 import vertices.VertexSsspBinaryTree;
 
 /**
- * A client that uses a preexisting AWS Cluster.
- * 
+ *
  * @author Pete Cappello
  */
-public class ClientSsspBinaryTree
+public class CompleteSsspBinaryTreeAws
 {
     /**
-     * @param args[0] Public domain name of Master's machine
-     *        args[1]: Job directory name
-     *        args[2]: Number of workers
-     *        args[3]: input file path name (path relative to project)
+     * @param args[0]: Job directory name
+     *        args[1]: Number of workers
+     *        args[2]: File name (path relative to project)
      */
     public static void main( String[] args ) throws Exception
     {
-        int numWorkers = Integer.parseInt( args[2] );        
+        int numWorkers = Integer.parseInt( args[1] );  
         System.out.println("ClientSsspBinaryTreeAws: numWorkers: " + numWorkers);
-        new AmazonS3Client(PregelAuthenticator.get()).putObject( args[0], "input", new File( args[3] ) );
+        Cluster cluster = Ec2ReservationService.newMassiveCluster(numWorkers);
+        if( args.length > 2 ) 
+        {
+            new AmazonS3Client(PregelAuthenticator.get()).putObject( args[0], "input", new File( args[2] ) );
+        }
         Job job = new Job("Binary Tree Shortest Path",  // jobName
-                args[1],
+                args[0],              // jobDirectoryName (S3 bucket name)
                 new VertexSsspBinaryTree(),     // vertexFactory
                 new MasterGraphMakerBinaryTree2(),  
                 new WorkerGraphMakerBinaryTree2(),   
                 new MasterOutputMakerStandard(),
                 new WorkerOutputMakerStandard()                 
                 );
-        String url = "rmi://" + args[0] + "/" + Master.CLIENT_SERVICE_NAME;
-        Master master = (Master) Naming.lookup( url );
-        JobRunData jobRunData = master.run( job );
+        JobRunData jobRunData = cluster.run( job );
         System.out.println( jobRunData );
+        cluster.terminate();
         System.exit( 0 );
     }
 }

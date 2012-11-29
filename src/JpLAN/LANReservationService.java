@@ -1,6 +1,6 @@
 package JpLAN;
 
-import api.Cluster;
+import api.ClusterImpl;
 import api.MachineGroup;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
@@ -26,8 +26,8 @@ public class LANReservationService extends ReservationServiceImpl {
         return new LANMasterMachineGroup();
     }
     
-    public static Cluster newLocalCluster(int numWorkers) throws InterruptedException, ExecutionException, IOException {
+    public static ClusterImpl newLocalCluster(int numWorkers) throws InterruptedException, ExecutionException, IOException {
         LANReservationService rs = new LANReservationService();
-        return new Cluster (rs,"","",numWorkers);
+        return new ClusterImpl (rs,"","",numWorkers);
     }
 }

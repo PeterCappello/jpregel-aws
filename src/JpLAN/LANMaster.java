@@ -14,11 +14,12 @@ import system.Master;
  *
  * @author charlesmunger
  */
-public class LANMaster extends Master {
-
+public class LANMaster extends Master 
+{
     LANMaster() throws RemoteException {}
     
-    public static void main(String[] args) throws RemoteException, AlreadyBoundException, InterruptedException {
+    public static void main(String[] args) throws RemoteException, AlreadyBoundException, InterruptedException 
+    {
         System.setSecurityManager(new RMISecurityManager());
         Registry registry = LocateRegistry.createRegistry(PORT);
         ClientToMaster master = new LANMaster();
@@ -29,15 +30,8 @@ public class LANMaster extends Master {
     }
     
     @Override
-    public void shutdown()
-    {
-        System.exit(0);
-    }
+    public void shutdown() { System.exit(0); }
 
     @Override
-    public FileSystem makeFileSystem(String jobDirectoryName)
-    {
-        return new LocalFileSystem(jobDirectoryName);
-    }
-
+    public FileSystem makeFileSystem(String jobDirectoryName) { return new LocalFileSystem(jobDirectoryName); }
 }
