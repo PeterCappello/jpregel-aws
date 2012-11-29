@@ -90,6 +90,7 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster
     @Override
     public JobRunData run(Job job, String localFilePathName) throws RemoteException, InterruptedException
     {
+        System.out.println("ClusterImpl.run: S3 job directory name: " + job.getJobDirectoryName());
         new AmazonS3Client(PregelAuthenticator.get()).putObject( job.getJobDirectoryName(), "input", new File( localFilePathName ) );
         return run(job);
     }
