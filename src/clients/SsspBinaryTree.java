@@ -35,7 +35,8 @@ public class SsspBinaryTree
                 new WorkerOutputMakerStandard()                 
                 );
         System.out.println("SsspBinaryTree: " + job);
-        JobRunData jobRunData = ClusterImpl.getCluster().run( job, args[1] );
+//        JobRunData jobRunData = ClusterImpl.getCluster().run( job, args[1] );
+        JobRunData jobRunData = ClusterImpl.getCluster().run( job );
         System.out.println( jobRunData );
         System.exit( 0 );
     }
