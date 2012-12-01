@@ -1,6 +1,9 @@
 package clients;
 
+import JpAws.PregelAuthenticator;
 import api.ClusterImpl;
+import com.amazonaws.services.s3.AmazonS3Client;
+import java.io.File;
 import system.Job;
 import system.JobRunData;
 import system.MasterGraphMakerBinaryTree2;
@@ -22,6 +25,7 @@ public class SsspBinaryTree
      */
     public static void main( String[] args ) throws Exception
     {
+        new AmazonS3Client(PregelAuthenticator.get()).putObject( "petercappello", "input", new File( args[1] ) );
         Job job = new Job("Binary Tree Shortest Path",  // jobName
                 args[0],
                 new VertexSsspBinaryTree(),     // vertexFactory
