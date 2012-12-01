@@ -25,7 +25,6 @@ public class SsspBinaryTree
      */
     public static void main( String[] args ) throws Exception
     {
-        new AmazonS3Client(PregelAuthenticator.get()).putObject( "petercappello", "input", new File( args[1] ) );
         Job job = new Job("Binary Tree Shortest Path",  // jobName
                 args[0],
                 new VertexSsspBinaryTree(),     // vertexFactory
@@ -34,10 +33,9 @@ public class SsspBinaryTree
                 new MasterOutputMakerStandard(),
                 new WorkerOutputMakerStandard()                 
                 );
-        System.out.println("SsspBinaryTree: " + job);
-//        JobRunData jobRunData = ClusterImpl.getCluster().run( job, args[1] );
-        JobRunData jobRunData = ClusterImpl.getCluster().run( job );
+        System.out.println("SsspBinaryTree: " + job );
+        JobRunData jobRunData = ClusterImpl.getCluster().run( job, args[1] );
         System.out.println( jobRunData );
-        System.exit( 0 );
+//        System.exit( 0 );
     }
 }

@@ -28,7 +28,7 @@ public class CompleteSsspBinaryTreeAws
         int numWorkers = Integer.parseInt( args[1] );  
         System.out.println("ClientSsspBinaryTreeAws: numWorkers: " + numWorkers);
         Cluster cluster = Ec2ReservationService.newMassiveCluster(numWorkers);
-        new AmazonS3Client(PregelAuthenticator.get()).putObject( args[0], "input", new File( args[2] ) );
+        new AmazonS3Client(PregelAuthenticator.get()).putObject( args[0], "input", new File( args[2]) );
         Job job = new Job("Binary Tree Shortest Path",  // jobName
                 args[0],              // jobDirectoryName (S3 bucket name)
                 new VertexSsspBinaryTree(),     // vertexFactory

@@ -15,7 +15,7 @@ public class ClusterLaunchEc2
     public static void main( String[] args ) throws Exception
     {
         int numWorkers = Integer.parseInt( args[0] );  
-        System.out.println( "Ec2ReservationService.main: Launched " + numWorkers + " workers." );
+        System.out.println( "ClusterLaunchEc2.main: Launching " + numWorkers + " workers." );
         Ec2ReservationService.newMassiveCluster( numWorkers );
     }
 }
